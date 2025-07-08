@@ -4,6 +4,6 @@ variable "ecr_name" {
 }
 
 variable "scan_on_push" {
-  description = "Чи вмикати сканування при пуші"
+  description = "Увімкнути сканування під час пушу"
   type        = bool
 }
