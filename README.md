@@ -1,24 +1,18 @@
-# Terraform AWS Infrastructure — Lesson 5
+# Lesson 7 — Kubernetes Deployment via EKS + Helm
 
-This project provisions basic AWS infrastructure using Terraform with modular structure and remote state backend.
+This project provisions an EKS Kubernetes cluster using Terraform, builds and pushes a Django Docker image to AWS ECR, and deploys the application using Helm.
 
-## 📁 Project Structure
+---
 
-```
-lesson-5/
-├── backend.tf             # S3 + DynamoDB backend configuration
-├── main.tf                # Module connections
-├── modules/
-│ ├── s3-backend/          # Remote state backend (S3 + DynamoDB)
-│ ├── vpc/                 # Network infrastructure
-│ └── ecr/                 # Docker image repository (ECR)
-```
+## Infrastructure Summary
 
-## ⚙️ Terraform Commands
+- **EKS Cluster** — provisioned with Terraform into an existing VPC
+- **IAM Role** — for cluster control plane
+- **ECR Repository** — to store Docker image
+- **Helm Chart** includes:
+  - Deployment using image from ECR
+  - ConfigMap with environment variables
+  - LoadBalancer Service for external access
+  - Horizontal Pod Autoscaler (HPA)
 
-```bash
-terraform init
-terraform plan
-terraform apply
-terraform destroy
-```
+---
