@@ -2,3 +2,6 @@
 .terraform/
 *.tfstate*
 *.log
+.terraform/
+*.tfstate*
+*.log
