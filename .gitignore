@@ -5,3 +5,4 @@
 .terraform/
 *.tfstate*
 *.log
+lesson-8-9/aws-credentials
