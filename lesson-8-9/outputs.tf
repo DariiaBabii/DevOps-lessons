@@ -42,3 +42,13 @@ output "eks_node_role_arn" {
   description = "IAM role ARN for EKS worker nodes"
   value       = module.eks.eks_node_role_arn
 }
+
+output "rds_endpoint" {
+  value       = module.rds.endpoint
+  description = "RDS endpoint hostname"
+}
+
+output "rds_port" {
+  value       = module.rds.port
+  description = "RDS port number"
+}
