@@ -44,45 +44,53 @@ module "eks" {
   min_size        = 1                             
 }
 
+data "aws_eks_cluster" "eks" {
+  name = module.eks.eks_cluster_name
+}
+
 data "aws_eks_cluster_auth" "eks" {
   name = var.cluster_name
 }
 
 provider "helm" {
   kubernetes = {
-    host                   = module.eks.eks_cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.eks_cluster_ca_data)
+    host                   = data.aws_eks_cluster.eks.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
     token                  = data.aws_eks_cluster_auth.eks.token
   }
 }
 
-module "jenkins" {
-  source            = "./modules/jenkins"
-  cluster_name      = module.eks.eks_cluster_name
-  oidc_provider_arn = module.eks.oidc_provider_arn
-  oidc_provider_url = module.eks.oidc_provider_url
-  github_pat        = var.github_pat
-  github_user       = var.github_user
-  github_repo_url   = var.github_repo_url
-  depends_on        = [module.eks]
-  providers         = {
-    helm       = helm
-    kubernetes = kubernetes
-  }
-}
+# module "jenkins" {
+#  source            = "./modules/jenkins"
+#  cluster_name      = module.eks.eks_cluster_name
+#  oidc_provider_arn = module.eks.oidc_provider_arn
+#  oidc_provider_url = module.eks.oidc_provider_url
+#  github_pat        = var.github_pat
+#  github_user       = var.github_user
+#  github_repo_url   = var.github_repo_url
+#  depends_on        = [module.eks]
+#  providers         = {
+#    helm       = helm
+#    kubernetes = kubernetes
+#  }
+#}
 
 provider "kubernetes" {
-  host                   = module.eks.eks_cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.eks_cluster_ca_data)
+  host                   = data.aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.eks.token
 }
 
-module "argo_cd" {
-  source        = "./modules/argo_cd"
-  namespace     = "argocd"
-  chart_version = "5.46.4"
-  depends_on    = [module.eks]
-}
+#module "argo_cd" {
+#  source        = "./modules/argo_cd"
+#  namespace     = "argocd"
+#  chart_version = "5.46.4"
+#  depends_on    = [module.eks]
+#    providers = {
+#    helm       = helm
+#    kubernetes = kubernetes
+#  }
+#}
 
 module "rds" {
   source = "./modules/rds"
@@ -93,7 +101,7 @@ module "rds" {
 
   # Only if use_aurora = false
   engine                     = "postgres"
-  engine_version             = "15.4"
+  engine_version             = "15.13"
   parameter_group_family_rds = "postgres15"
 
   # Common
@@ -120,5 +128,17 @@ module "rds" {
     Project     = "lesson-8-9"
   }
 }
+
+#module "monitoring" {
+#  source         = "./modules/monitoring"
+#  namespace      = "monitoring"
+#  chart_version  = "75.13.0"
+#  helm_dependency = [module.eks] 
+#  depends_on     = [module.eks]
+#    providers = {
+#    helm       = helm
+#    kubernetes = kubernetes
+#  }
+#}
 
 
